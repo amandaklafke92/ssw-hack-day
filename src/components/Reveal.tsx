@@ -6,6 +6,8 @@ type RevealProps = {
 };
 
 export function Reveal({ reading, onRestart }: RevealProps) {
+  const weeksRemaining = Math.max(1, Math.round(reading.daysRemaining / 7));
+
   return (
     <div className="screen">
       <div className="certificate">
@@ -18,7 +20,7 @@ export function Reveal({ reading, onRestart }: RevealProps) {
       </div>
 
       <p className="reflection-line">
-        You have approximately <strong>{reading.daysRemaining.toLocaleString()} days</strong> left.
+        You have approximately <strong>{weeksRemaining.toLocaleString()} weeks</strong> left.
         What are you doing with them?
       </p>
 
