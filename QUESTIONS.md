@@ -2,32 +2,36 @@
 
 ## Question Set
 
-1. **How many years have you already escaped the void?**
+1. **What is your name?**
+   - Input: text
+   - Maps to: display-only, not sent to `getReading()`
+
+2. **What is your age?**
    - Input: number
    - Maps to: `age`
 
-2. **Which record should fate file you under?**
+3. **What is your gender?**
    - Options: `Male`, `Female`, `Other`
    - Maps to: `gender`
 
-3. **Where are you currently tempting fate?**
+4. **What country do you live in?**
    - Input: country selector or text input
    - Maps to: `country`
 
-4. **How often do you drink alcohol?**
-   - Options: `Never / Rarely`, `Regularly`
+5. **Do you drink alcohol regularly?**
+   - Options: `Yes`, `No`
    - Maps to: `drinksAlcohol`
 
-5. **Have you ever received a speeding ticket?**
+6. **Have you ever had a speeding ticket?**
    - Options: `Yes`, `No`
    - Maps to: `hasSpeedingTicket`
 
-6. **What's your general state of mind lately?**
-   - Options: `Suspiciously calm`, `One email away from becoming folklore`, `Making choices the ancestors would question`, `Staring into the void, and the void is typing back`
+7. **How is your general mood lately?**
+   - Options: `Calm`, `Stressed`, `Reckless`, `Thoughtful`
    - Maps to: `mood`
 
-7. **How often do you exercise?**
-   - Options: `Rarely, my couch has legal custody`, `Sometimes, when guilt gets loud`, `Often, my smartwatch fears me`
+8. **How often do you exercise?**
+   - Options: `Rarely`, `Sometimes`, `Often`
    - Maps to: `exerciseLevel`
 
 ## Answer Mapping
@@ -44,24 +48,26 @@ type QuizAnswers = {
 }
 ```
 
+- `name` is display-only and is not part of `QuizAnswers`.
 - `Male` -> `gender: 'male'`
 - `Female` -> `gender: 'female'`
 - `Other` -> `gender: 'other'`
-- `Never / Rarely` -> `drinksAlcohol: false`
-- `Regularly` -> `drinksAlcohol: true`
-- `Yes` -> `hasSpeedingTicket: true`
-- `No` -> `hasSpeedingTicket: false`
-- `Suspiciously calm` -> `mood: 'calm'`
-- `One email away from becoming folklore` -> `mood: 'stressed'`
-- `Making choices the ancestors would question` -> `mood: 'reckless'`
-- `Staring into the void, and the void is typing back` -> `mood: 'existential'`
-- `Rarely, my couch has legal custody` -> `exerciseLevel: 'low'`
-- `Sometimes, when guilt gets loud` -> `exerciseLevel: 'medium'`
-- `Often, my smartwatch fears me` -> `exerciseLevel: 'high'`
+- Alcohol `Yes` -> `drinksAlcohol: true`
+- Alcohol `No` -> `drinksAlcohol: false`
+- Speeding ticket `Yes` -> `hasSpeedingTicket: true`
+- Speeding ticket `No` -> `hasSpeedingTicket: false`
+- `Calm` -> `mood: 'calm'`
+- `Stressed` -> `mood: 'stressed'`
+- `Reckless` -> `mood: 'reckless'`
+- `Thoughtful` -> `mood: 'existential'`
+- `Rarely` -> `exerciseLevel: 'low'`
+- `Sometimes` -> `exerciseLevel: 'medium'`
+- `Often` -> `exerciseLevel: 'high'`
 
 ## Validation Notes
 
+- `name` is optional unless the UI uses it on the reveal screen.
 - `age` is required and should be a sensible number, such as `1` through `120`.
 - `country` is required and should match a `life.json` country when possible.
-- All option questions should require one selected answer before revealing fate.
-- The quiz should collect exactly these seven answers and pass them directly to `getReading()`.
+- All mapped option questions should require one selected answer before revealing fate.
+- The quiz should pass only the `QuizAnswers` fields directly to `getReading()`.
