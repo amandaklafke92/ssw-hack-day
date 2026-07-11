@@ -19,6 +19,13 @@ export type ImageContext = {
   imageAlt: string;
 };
 
+export type AgingLevel = 'subtle' | 'middle-aged' | 'elderly' | 'ancient';
+
+export type AgedImageContext = ImageContext & {
+  predictedAgeAtDeath: number;
+  agingLevel: AgingLevel;
+};
+
 type ImageTheme = {
   styleTag: ImageStyleTag;
   promptDetail: string;
@@ -142,6 +149,43 @@ function buildImagePrompt(reading: Reading, theme: ImageTheme): string {
   ].join(', ');
 }
 
+function getPredictedAgeAtDeath(answers: QuizAnswers, reading: Reading): number {
+  return answers.age + Math.round(reading.daysRemaining / 365.25);
+}
+
+function getAgingLevel(answers: QuizAnswers, predictedAgeAtDeath: number): AgingLevel {
+  const yearsOlder = Math.max(0, predictedAgeAtDeath - answers.age);
+
+  if (yearsOlder <= 10) return 'subtle';
+  if (yearsOlder <= 25) return 'middle-aged';
+  if (yearsOlder <= 45) return 'elderly';
+  return 'ancient';
+}
+
+function buildAgedImagePrompt(reading: Reading, theme: ImageTheme, predictedAgeAtDeath: number, agingLevel: AgingLevel): string {
+  const safeCause = shortenForPrompt(reading.causeOfDeath);
+
+  return [
+    `Cinematic aged portrait background for a person at about ${predictedAgeAtDeath} years old`,
+    `aging level: ${agingLevel}`,
+    'aged face atmosphere',
+    'time passing',
+    'wrinkles',
+    'silver hair',
+    'dramatic but non-graphic',
+    'dark comedy Grim oracle style',
+    theme.promptDetail,
+    `symbolic inspiration: ${safeCause}`,
+    'no gore',
+    'no wounds',
+    'no injury detail',
+    'no self-harm',
+    'no realistic death scene',
+    'screenshot-friendly',
+    'no text in image'
+  ].join(', ');
+}
+
 export function buildPollinationsImageUrl(imagePrompt: string): string {
   return `${POLLINATIONS_IMAGE_BASE_URL}${encodeURIComponent(imagePrompt)}?width=768&height=512&nologo=true&safe=true`;
 }
@@ -157,5 +201,23 @@ export function getImageContext(answers: QuizAnswers, reading: Reading): ImageCo
     fallbackStyleTag,
     imagePrompt,
     imageAlt: theme.alt
+  };
+}
+
+export function getAgedImageContext(answers: QuizAnswers, reading: Reading): AgedImageContext {
+  const fallbackStyleTag = chooseImageStyleTag(answers);
+  const theme = IMAGE_THEME_BY_TAG[fallbackStyleTag] || IMAGE_THEME_BY_TAG.default;
+  const predictedAgeAtDeath = getPredictedAgeAtDeath(answers, reading);
+  const agingLevel = getAgingLevel(answers, predictedAgeAtDeath);
+  const imagePrompt = buildAgedImagePrompt(reading, theme, predictedAgeAtDeath, agingLevel);
+
+  return {
+    imageStatus: 'success',
+    generatedBackgroundUrl: buildPollinationsImageUrl(imagePrompt),
+    fallbackStyleTag,
+    imagePrompt,
+    imageAlt: `Aged ${theme.alt}`,
+    predictedAgeAtDeath,
+    agingLevel
   };
 }
