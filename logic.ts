@@ -2,11 +2,15 @@
 // 1. TYPES & CONTRACT INTERFACE
 // ==========================================
 
+import lifeExpectancyData from './life.json';
+
 export type QuizAnswers = {
   age: number;
+  gender: 'male' | 'female' | 'other';
   country: string;
   drinksAlcohol: boolean;
   hasSpeedingTicket: boolean;
+  hasCarCrash: boolean;
   exerciseLevel: 'low' | 'medium' | 'high';
 };
 
@@ -152,21 +156,36 @@ const SCENARIO_BANK: DeathScenario[] = [
 // 3. DATA LOOKUPS (Life Expectancy)
 // ==========================================
 
-// Global averages fallback + standard country tables (Grounded baseline data)
+// Global average fallback for countries not in life.json
 const GLOBAL_DEFAULT_EXPECTANCY = 73.0;
 
-const LIFE_EXPECTANCY_TABLE: Record<string, number> = {
-  "australia": 83.2,
-  "united states": 77.3,
-  "united kingdom": 80.9,
-  "canada": 81.7,
-  "new zealand": 82.5,
-  "brazil": 76.2,
-  "vietnam": 74.1,
-  "japan": 84.6,
-  "germany": 80.8,
-  "france": 82.4
+type LifeExpectancyEntry = {
+  country: string;
+  both: number;
+  female: number;
+  male: number;
+  rank: number;
 };
+
+const LIFE_EXPECTANCY_BY_COUNTRY: Record<string, LifeExpectancyEntry> = (
+  lifeExpectancyData as LifeExpectancyEntry[]
+).reduce((table, entry) => {
+  table[entry.country.trim().toLowerCase()] = entry;
+  return table;
+}, {} as Record<string, LifeExpectancyEntry>);
+
+/**
+ * Looks up base life expectancy for a country, split by gender where available.
+ * 'other' (and any gender for an unmatched country) falls back to the 'both' column.
+ */
+function getBaseExpectancy(country: string, gender: QuizAnswers['gender']): number {
+  const entry = LIFE_EXPECTANCY_BY_COUNTRY[(country || '').trim().toLowerCase()];
+  if (!entry) return GLOBAL_DEFAULT_EXPECTANCY;
+
+  if (gender === 'male') return entry.male;
+  if (gender === 'female') return entry.female;
+  return entry.both;
+}
 
 // ==========================================
 // 4. LOGIC ENGINE FUNCTIONS
@@ -182,6 +201,7 @@ function determineTags(answers: QuizAnswers): string[] {
   if (answers.exerciseLevel === 'low') tags.push('sedentary');
   if (answers.exerciseLevel === 'high' && !answers.drinksAlcohol) tags.push('health-nut');
   if (answers.drinksAlcohol && answers.hasSpeedingTicket) tags.push('chaotic');
+  if (answers.hasCarCrash) tags.push('unlucky');
 
   return tags;
 }
@@ -190,15 +210,13 @@ function determineTags(answers: QuizAnswers): string[] {
  * Calculates a funny but mathematically functional death date based on modifiers
  */
 function calculateDeathDate(answers: QuizAnswers): { dateStr: string; daysLeft: number } {
-  // Edge case safety check: Norm/clean input country string
-  const normalizedCountry = (answers.country || "").trim().toLowerCase();
-  
-  // Base expectation fetch
-  let baseExpectancy = LIFE_EXPECTANCY_TABLE[normalizedCountry] || GLOBAL_DEFAULT_EXPECTANCY;
-  
+  // Base expectation fetch, split by gender where the country has that data
+  let baseExpectancy = getBaseExpectancy(answers.country, answers.gender);
+
   // Apply modifiers (as defined by PRD)
   if (answers.drinksAlcohol) baseExpectancy -= 2.0;
   if (answers.hasSpeedingTicket) baseExpectancy -= 1.5;
+  if (answers.hasCarCrash) baseExpectancy -= 1.5;
   if (answers.exerciseLevel === 'low') baseExpectancy -= 3.0;
   if (answers.exerciseLevel === 'high') baseExpectancy += 2.0;
 
