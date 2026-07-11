@@ -1,4 +1,3 @@
-import { ReaperSilhouette } from '../icons';
 import gateImage from '../assets/cemetery-gate.jpg';
 
 type LandingProps = {
@@ -9,14 +8,12 @@ export function Landing({ onStart }: LandingProps) {
   return (
     <div className="screen landing-screen">
       <div className="gate-scene">
-        <img src={gateImage} className="gate-image" alt="" aria-hidden="true" />
-        <div className="gate-vignette" />
         <div className="gate-fog gate-fog-a" />
         <div className="gate-fog gate-fog-b" />
-        <div className="gate-glow" />
-        <div className="gate-reaper-wrap">
-          <ReaperSilhouette className="gate-reaper" />
-        </div>
+        <img src={gateImage} className="gate-leaf-img gate-leaf-left" alt="" aria-hidden="true" />
+        <img src={gateImage} className="gate-leaf-img gate-leaf-right" alt="" aria-hidden="true" />
+        <div className="gate-smoke-burst" />
+        <div className="gate-vignette" />
       </div>
 
       <div className="landing-content">

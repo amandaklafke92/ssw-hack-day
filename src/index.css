@@ -167,7 +167,7 @@ select {
   align-items: center;
   padding: 32px 20px 40px;
   opacity: 0;
-  animation: landing-content-in 1s ease 3.2s forwards;
+  animation: landing-content-in 1s ease 5.2s forwards;
 }
 
 @keyframes landing-content-in {
@@ -198,20 +198,55 @@ select {
 .gate-scene {
   position: relative;
   width: 100%;
-  height: min(72vh, 640px);
+  /* height-capped so the hero never grows taller than the viewport at
+     wide widths, which would push the reveal text below the fold */
+  height: min(70vh, 620px);
   min-height: 380px;
   overflow: hidden;
+  perspective: 900px;
+  background: var(--bg);
 }
 
-.gate-image {
+.gate-leaf-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
+  /* contain, not cover: shows the whole photo (pillars down to the
+     ground) with no cropping, letterboxed into the dark bg if needed */
+  object-fit: contain;
+  object-position: center;
   filter: grayscale(20%) brightness(0.68) contrast(1.15) saturate(1.05);
-  transform: scale(1.08);
+}
+
+.gate-leaf-left {
+  clip-path: inset(0 50% 0 0);
+  transform-origin: left center;
+  animation: gate-open-left 1.8s ease-in 1.4s forwards;
+}
+
+.gate-leaf-right {
+  clip-path: inset(0 0 0 50%);
+  transform-origin: right center;
+  animation: gate-open-right 1.8s ease-in 1.4s forwards;
+}
+
+@keyframes gate-open-left {
+  0% {
+    transform: translateX(0) rotateY(0deg);
+  }
+  100% {
+    transform: translateX(-8%) rotateY(-22deg);
+  }
+}
+
+@keyframes gate-open-right {
+  0% {
+    transform: translateX(0) rotateY(0deg);
+  }
+  100% {
+    transform: translateX(8%) rotateY(22deg);
+  }
 }
 
 .gate-vignette {
@@ -223,6 +258,7 @@ select {
   pointer-events: none;
 }
 
+/* ambient ground haze, present from first frame */
 .gate-fog {
   position: absolute;
   height: 45%;
@@ -233,6 +269,7 @@ select {
   filter: blur(6px);
   pointer-events: none;
   mix-blend-mode: screen;
+  z-index: 2;
 }
 
 .gate-fog-a {
@@ -270,116 +307,96 @@ select {
   }
 }
 
-.gate-glow {
+/* the big smoke wipe: billows in to fully obscure the doors mid-swing, then clears */
+.gate-smoke-burst {
   position: absolute;
-  top: 18%;
-  bottom: 8%;
-  left: 50%;
-  width: 2px;
-  transform: translateX(-50%);
-  background: linear-gradient(to bottom, transparent, rgba(224, 210, 255, 0.9) 35%, rgba(192, 132, 252, 0.8) 65%, transparent);
-  filter: blur(2px);
+  inset: -15%;
   opacity: 0;
-  animation: gate-crack 3.6s ease-out 0.5s forwards, gate-pulse 2.4s ease-in-out 2.2s infinite;
+  pointer-events: none;
+  z-index: 3;
+  animation: smoke-burst-fade 3.4s ease-in-out 2s forwards;
 }
 
-@keyframes gate-crack {
+.gate-smoke-burst::before,
+.gate-smoke-burst::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  filter: blur(20px);
+}
+
+.gate-smoke-burst::before {
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 60%,
+    rgba(214, 209, 224, 0.95),
+    rgba(214, 209, 224, 0.55) 50%,
+    transparent 75%
+  );
+  animation: smoke-churn-a 4.5s ease-in-out infinite;
+}
+
+.gate-smoke-burst::after {
+  background: radial-gradient(ellipse 65% 55% at 45% 45%, rgba(196, 190, 210, 0.9), transparent 70%);
+  animation: smoke-churn-b 5.5s ease-in-out infinite;
+}
+
+@keyframes smoke-burst-fade {
   0% {
-    width: 0;
     opacity: 0;
   }
-  60% {
-    width: 10px;
-    opacity: 0.9;
+  35% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 1;
   }
   100% {
-    width: 22px;
-    opacity: 0.7;
-  }
-}
-
-@keyframes gate-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 0.85;
-  }
-}
-
-.gate-reaper-wrap {
-  position: absolute;
-  bottom: 6%;
-  left: 50%;
-  width: clamp(130px, 26vh, 220px);
-  transform: translateX(-50%) translateY(35px) scale(0.88);
-  opacity: 0;
-  animation: reaper-rise 1.8s cubic-bezier(0.16, 0.9, 0.3, 1) 1.3s forwards;
-}
-
-@keyframes reaper-rise {
-  0% {
-    transform: translateX(-50%) translateY(35px) scale(0.88);
     opacity: 0;
   }
-  100% {
-    transform: translateX(-50%) translateY(0) scale(1);
-    opacity: 1;
-  }
 }
 
-.gate-reaper {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
-  animation: reaper-sway 5s ease-in-out 3.1s infinite;
-}
-
-@keyframes reaper-sway {
+@keyframes smoke-churn-a {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate(-4%, 0) scale(1);
   }
   50% {
-    transform: translateY(-3px);
+    transform: translate(4%, -3%) scale(1.15);
   }
 }
 
-.reaper-eyes {
-  animation: eye-pulse 2.6s ease-in-out 3.1s infinite;
-}
-
-@keyframes eye-pulse {
+@keyframes smoke-churn-b {
   0%,
   100% {
-    opacity: 0.7;
+    transform: translate(3%, 2%) scale(1.05);
   }
   50% {
-    opacity: 1;
+    transform: translate(-5%, -2%) scale(1.2);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gate-fog-a,
   .gate-fog-b,
-  .gate-glow,
-  .gate-reaper-wrap,
-  .gate-reaper,
-  .reaper-eyes,
+  .gate-leaf-left,
+  .gate-leaf-right,
+  .gate-smoke-burst,
+  .gate-smoke-burst::before,
+  .gate-smoke-burst::after,
   .landing-content {
     animation: none;
   }
 
-  .gate-reaper-wrap {
-    opacity: 1;
-    transform: translateX(-50%);
+  .gate-leaf-left {
+    transform: translateX(-8%) rotateY(-22deg);
   }
 
-  .gate-glow {
-    opacity: 0.7;
-    width: 22px;
+  .gate-leaf-right {
+    transform: translateX(8%) rotateY(22deg);
+  }
+
+  .gate-smoke-burst {
+    opacity: 0;
   }
 
   .landing-content {
