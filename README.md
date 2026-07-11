@@ -22,5 +22,5 @@ No server. Quiz answers map to tags (reckless, sedentary, health-nut, ...), whic
 
 ## Team
 
-- **UI + Questions:** _TBD_
-- **Logic + Death-Scenarios:** _TBD_, _TBD_
+- **UI + Questions:** Amanda
+- **Logic + Death-Scenarios:** Nabin, Kevin
