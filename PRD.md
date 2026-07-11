@@ -43,11 +43,13 @@ Entry point: Landing screen
 ### Screen 2: Quiz
 **Purpose:** capture inputs used to select a scenario and compute a date
 **Layout:** single scrolling form (not a multi-step wizard), reaper-voiced field labels/microcopy
-**Proposed fields** (Logic team should confirm exact set against what `getReading()` needs):
+**Fields:** owned by the Logic + Questions team (see Section 11) — UI renders whatever field set they define against `QuizAnswers`. As of this revision that's:
 - Age (number)
+- Gender (male/female/other)
 - Country/location
 - Drinks alcohol regularly? (yes/no)
 - Ever had a speeding ticket? (yes/no)
+- Ever had a car crash? (yes/no)
 - Exercise frequency (low/medium/high)
 - *(Stretch)* Upload a photo
 **Primary action:** "Reveal My Fate" — disabled until required fields (age, country) are filled
@@ -65,18 +67,21 @@ Entry point: Landing screen
 
 ## 6. Scenario & Logic Strategy
 
-- **Scenario bank:** ~15–20 pre-written death scenarios in a static data file (`scenarios.ts`), each tagged with trait(s) — e.g. `reckless`, `sedentary`, `health-nut`, `unlucky`, `chaotic`.
-- **Selection logic:** quiz answers map to one or more tags (e.g. speeding ticket = yes → `reckless`; low exercise → `sedentary`). Pick a random scenario from the matching pool; fall back to an untagged general pool if nothing matches — never show an empty result.
-- **Date calc:** base life expectancy from a small static lookup table (~10–15 countries + a default), adjusted by lightweight modifiers per risky answer (e.g. −2 years if drinks regularly, −1 year per speeding ticket, capped at some floor). Doesn't need to be actuarially real — just needs to feel grounded.
+- **Scenario bank:** ~15–20 pre-written death scenarios in a static data file (`logic.ts`), each tagged with trait(s) — e.g. `reckless`, `sedentary`, `health-nut`, `unlucky`, `chaotic`.
+- **Selection logic:** quiz answers map to one or more tags (e.g. speeding ticket = yes → `reckless`; low exercise → `sedentary`; car crash = yes → `unlucky`). Pick a random scenario from the matching pool; fall back to an untagged general pool if nothing matches — never show an empty result.
+- **Date calc:** base life expectancy from `life.json` (real per-country data, split male/female/both), adjusted by lightweight modifiers per risky answer (e.g. −2 years if drinks regularly, −1.5 years per speeding ticket or car crash, capped at some floor). Doesn't need to be actuarially real — just needs to feel grounded.
+- Because the question set, tags, and scenarios are so tightly coupled, they're now designed and owned together by one team rather than split across workstreams (see Section 11).
 
 ### Shared interface — the integration contract between the two workstreams
 
 ```ts
 type QuizAnswers = {
   age: number
+  gender: 'male' | 'female' | 'other'
   country: string
   drinksAlcohol: boolean
   hasSpeedingTicket: boolean
+  hasCarCrash: boolean
   exerciseLevel: 'low' | 'medium' | 'high'
 }
 
@@ -90,7 +95,7 @@ type Reading = {
 function getReading(answers: QuizAnswers): Reading
 ```
 
-The UI team calls `getReading()` and renders whatever comes back — they never touch scenario content or date math. The Logic team owns everything inside that function — they never touch components or styling. **Agree on this exact shape before either side starts building.**
+The UI team calls `getReading()` and renders whatever comes back, and renders the quiz form fields as defined by this type — they never touch scenario content, question definitions, or date math. The Logic + Questions team owns everything inside that function, plus the field set the quiz form needs to collect. **Agree on this exact shape before either side starts building** — and re-agree whenever it changes, since the UI form depends on it directly.
 
 ## 7. Interaction Patterns and Micro-interactions
 
@@ -114,9 +119,9 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 
 ## 10. Implementation Checklist
 
-**UI + Questions — Amanda**
+**UI — Amanda**
 - [ ] Landing screen with CTA
-- [ ] Quiz form, all fields, inline validation
+- [ ] Quiz form — renders the field set defined by the Logic + Questions team, inline validation
 - [ ] Consulting transition screen (themed, timed)
 - [ ] Reveal card layout — consumes `Reading` from `getReading()`
 - [ ] Reflection line
@@ -124,10 +129,11 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 - [ ] Grim Reaper visual theme applied across all screens
 - [ ] Mobile responsive pass
 
-**Logic + Death-Scenarios — Nabin, Kevin**
+**Logic + Questions + Death-Scenarios — Nabin, Kevin**
+- [ ] Define the quiz question set (`QuizAnswers` fields) — questions, tags, and scenarios are designed together
 - [ ] Write 15–20 tagged death scenarios
 - [ ] Build the tag-matching scenario selector + fallback pool
-- [ ] Build the date-calculation function (life-expectancy table + modifiers)
+- [ ] Build the date-calculation function (life-expectancy data + modifiers)
 - [ ] Implement `getReading(answers): Reading` per the shared interface above
 - [ ] Sanity-check edge cases: missing tags, extreme ages, unknown country
 
@@ -140,7 +146,7 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 
 | Workstream | Who | Owns | Does not touch |
 |---|---|---|---|
-| UI + Questions | Amanda | All screens/components, visual theme, calling `getReading()` | Scenario content, date math |
-| Logic + Death-Scenarios | Nabin, Kevin | `scenarios.ts`, tag selector, date calc, `getReading()` itself | Components, styling |
+| UI | Amanda | All screens/components, visual theme, calling `getReading()`, rendering quiz form fields | Scenario content, question definitions, date math |
+| Logic + Questions + Death-Scenarios | Nabin, Kevin | `logic.ts` (question/field definitions, tag selector, scenario bank, date calc, `getReading()` itself) | Components, styling |
 
-**Suggested order:** lock the `QuizAnswers` / `Reading` interface first (a few minutes, together) → build in parallel → integrate and polish in the last stretch of the session.
+**Suggested order:** lock the `QuizAnswers` / `Reading` interface first (a few minutes, together) → build in parallel → integrate and polish in the last stretch of the session. Since questions and scenarios are now one workstream, re-lock the interface with UI whenever `QuizAnswers` changes shape.
