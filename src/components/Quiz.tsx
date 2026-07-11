@@ -14,7 +14,7 @@ type FormState = {
   country: string;
   drinksAlcohol: YesNo;
   hasSpeedingTicket: YesNo;
-  hasCarCrash: YesNo;
+  mood: '' | QuizAnswers['mood'];
   exerciseLevel: '' | QuizAnswers['exerciseLevel'];
 };
 
@@ -24,8 +24,21 @@ const INITIAL_STATE: FormState = {
   country: '',
   drinksAlcohol: '',
   hasSpeedingTicket: '',
-  hasCarCrash: '',
+  mood: '',
   exerciseLevel: '',
+};
+
+const MOOD_LABELS: Record<QuizAnswers['mood'], string> = {
+  calm: 'Calm',
+  stressed: 'Stressed',
+  reckless: 'Reckless',
+  existential: 'Thoughtful',
+};
+
+const EXERCISE_LABELS: Record<QuizAnswers['exerciseLevel'], string> = {
+  low: 'Rarely',
+  medium: 'Sometimes',
+  high: 'Often',
 };
 
 function YesNoField({
@@ -83,7 +96,7 @@ export function Quiz({ onSubmit }: QuizProps) {
       country: form.country.trim(),
       drinksAlcohol: form.drinksAlcohol === 'yes',
       hasSpeedingTicket: form.hasSpeedingTicket === 'yes',
-      hasCarCrash: form.hasCarCrash === 'yes',
+      mood: form.mood || 'calm',
       exerciseLevel: form.exerciseLevel || 'medium',
     };
     onSubmit(answers);
@@ -168,15 +181,26 @@ export function Quiz({ onSubmit }: QuizProps) {
           onChange={(value) => setForm((f) => ({ ...f, hasSpeedingTicket: value }))}
         />
 
-        <YesNoField
-          name="hasCarCrash"
-          label="Have you ever been involved in a motor vehicle accident?"
-          value={form.hasCarCrash}
-          onChange={(value) => setForm((f) => ({ ...f, hasCarCrash: value }))}
-        />
+        <div className="field">
+          <label className="field-label">How is your general mood lately?</label>
+          <div className="choice-group" role="radiogroup" aria-label="Mood">
+            {(['calm', 'stressed', 'reckless', 'existential'] as const).map((option) => (
+              <div className="choice-option" key={option}>
+                <input
+                  type="radio"
+                  id={`mood-${option}`}
+                  name="mood"
+                  checked={form.mood === option}
+                  onChange={() => setForm((f) => ({ ...f, mood: option }))}
+                />
+                <label htmlFor={`mood-${option}`}>{MOOD_LABELS[option]}</label>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="field">
-          <label className="field-label">How would you describe your typical exercise frequency?</label>
+          <label className="field-label">How often do you exercise?</label>
           <div className="choice-group" role="radiogroup" aria-label="Exercise frequency">
             {(['low', 'medium', 'high'] as const).map((option) => (
               <div className="choice-option" key={option}>
@@ -187,9 +211,7 @@ export function Quiz({ onSubmit }: QuizProps) {
                   checked={form.exerciseLevel === option}
                   onChange={() => setForm((f) => ({ ...f, exerciseLevel: option }))}
                 />
-                <label htmlFor={`exercise-${option}`}>
-                  {option[0].toUpperCase() + option.slice(1)}
-                </label>
+                <label htmlFor={`exercise-${option}`}>{EXERCISE_LABELS[option]}</label>
               </div>
             ))}
           </div>
