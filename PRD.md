@@ -114,7 +114,7 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 
 ## 10. Implementation Checklist
 
-**UI + Questions (1 person)**
+**UI + Questions — Amanda**
 - [ ] Landing screen with CTA
 - [ ] Quiz form, all fields, inline validation
 - [ ] Consulting transition screen (themed, timed)
@@ -124,7 +124,7 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 - [ ] Grim Reaper visual theme applied across all screens
 - [ ] Mobile responsive pass
 
-**Logic + Death-Scenarios (2 people)**
+**Logic + Death-Scenarios — Nabin, Kevin**
 - [ ] Write 15–20 tagged death scenarios
 - [ ] Build the tag-matching scenario selector + fallback pool
 - [ ] Build the date-calculation function (life-expectancy table + modifiers)
@@ -138,9 +138,9 @@ The UI team calls `getReading()` and renders whatever comes back — they never 
 
 ## 11. Team Assignments
 
-| Workstream | Owns | Does not touch |
-|---|---|---|
-| UI + Questions | All screens/components, visual theme, calling `getReading()` | Scenario content, date math |
-| Logic + Death-Scenarios | `scenarios.ts`, tag selector, date calc, `getReading()` itself | Components, styling |
+| Workstream | Who | Owns | Does not touch |
+|---|---|---|---|
+| UI + Questions | Amanda | All screens/components, visual theme, calling `getReading()` | Scenario content, date math |
+| Logic + Death-Scenarios | Nabin, Kevin | `scenarios.ts`, tag selector, date calc, `getReading()` itself | Components, styling |
 
 **Suggested order:** lock the `QuizAnswers` / `Reading` interface first (a few minutes, together) → build in parallel → integrate and polish in the last stretch of the session.
