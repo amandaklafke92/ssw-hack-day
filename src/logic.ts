@@ -10,7 +10,7 @@ export type QuizAnswers = {
   country: string;
   drinksAlcohol: boolean;
   hasSpeedingTicket: boolean;
-  hasCarCrash: boolean;
+  mood: 'calm' | 'stressed' | 'reckless' | 'existential';
   exerciseLevel: 'low' | 'medium' | 'high';
 };
 
@@ -25,11 +25,11 @@ type DeathScenario = {
   id: string;
   text: string;
   tagline: string;
-  tags: string[]; // e.g. 'reckless', 'sedentary', 'health-nut', 'unlucky', 'chaotic'
+  tags: string[]; // e.g. 'reckless', 'sedentary', 'health-nut', 'unlucky', 'chaotic', 'tech-doom'
 };
 
 // ==========================================
-// 2. THE SCENARIO BANK (18 Absurd Scenarios)
+// 2. THE SCENARIO BANK (34 Absurd Scenarios)
 // ==========================================
 
 const SCENARIO_BANK: DeathScenario[] = [
@@ -53,6 +53,22 @@ const SCENARIO_BANK: DeathScenario[] = [
     tagline: "Recycled ahead of your time."
   },
 
+  // Road-Risk Tag
+  {
+    id: 'road_risk_1',
+    tags: ['road-risk', 'reckless'],
+    text: "While explaining that you are actually a very safe driver, your own parked car rolls downhill with impeccable timing and a suspicious sense of irony.",
+    tagline: "Your driving record filed the final report."
+  },
+
+  // Reckless-Party Tag
+  {
+    id: 'reckless_party_1',
+    tags: ['reckless-party', 'party-risk', 'road-risk', 'chaotic'],
+    text: "After declaring yourself completely fine to drive a go-kart in a pub car park, you lose a duel with a traffic cone that had right of way.",
+    tagline: "The cone was sober."
+  },
+
   // Sedentary Tag
   {
     id: 'sedentary_1',
@@ -71,6 +87,14 @@ const SCENARIO_BANK: DeathScenario[] = [
     tags: ['sedentary'],
     text: "While waiting for the elevator to take you up exactly one floor, an aggressive rogue robot vacuum cleaner sweeps your feet out from under you.",
     tagline: "You should have taken the stairs."
+  },
+
+  // Couch-Party Tag
+  {
+    id: 'couch_party_1',
+    tags: ['couch-party', 'sedentary', 'party-risk'],
+    text: "A couch, a half-finished drink, and one ambitious reach for the remote become a closed-casket situation with excellent surround sound.",
+    tagline: "Laid back, then laid out."
   },
 
   // Health-Nut Tag
@@ -93,6 +117,14 @@ const SCENARIO_BANK: DeathScenario[] = [
     tagline: "Crushed by your own gains."
   },
 
+  // Fitness-Irony Tag
+  {
+    id: 'fitness_irony_1',
+    tags: ['fitness-irony', 'health-nut'],
+    text: "Your smartwatch congratulates you on closing all rings just as a resistance band slips free and achieves a level of vengeance normally reserved for mythology.",
+    tagline: "Personal best, final worst."
+  },
+
   // Chaotic Tag
   {
     id: 'chaotic_1',
@@ -113,7 +145,35 @@ const SCENARIO_BANK: DeathScenario[] = [
     tagline: "It threw rock. You threw nothing fast enough."
   },
 
-  // Unlucky / General Pool (Fallbacks)
+  // Party-Risk Tag
+  {
+    id: 'party_risk_1',
+    tags: ['party-risk', 'chaotic'],
+    text: "You declare 'I'm basically fine' moments before challenging a kebab shop sign to single combat in front of a deeply unimpressed taxi queue.",
+    tagline: "The sign remains undefeated."
+  },
+  {
+    id: 'party_risk_2',
+    tags: ['party-risk'],
+    text: "You try to recreate a dance move last seen in 2008 and discover that physics has not forgiven anyone for that era.",
+    tagline: "The beat dropped. So did you."
+  },
+
+  // Australia Tag
+  {
+    id: 'australia_1',
+    tags: ['australia', 'chaotic'],
+    text: "A magpie remembers your face from 2019 and completes a long-term revenge arc with the patience of a tiny feathered tax auditor.",
+    tagline: "Spring came for you personally."
+  },
+  {
+    id: 'australia_2',
+    tags: ['australia', 'unlucky'],
+    text: "You ignore a beach warning sign because the ocean looks pretty chill today. The ocean takes that personally.",
+    tagline: "Never negotiate with surf."
+  },
+
+  // Mood / General Pool (Fallbacks)
   {
     id: 'unlucky_1',
     tags: ['unlucky'],
@@ -127,8 +187,56 @@ const SCENARIO_BANK: DeathScenario[] = [
     tagline: "Luck was never an option."
   },
   {
+    id: 'mood_stressed_1',
+    tags: ['stressed', 'tech-doom', 'chaotic'],
+    text: "You finally clear your inbox, only for one unread email marked 'quick question' to unfold into a 900-page workplace prophecy.",
+    tagline: "Inbox zero, pulse zero."
+  },
+  {
+    id: 'mood_existential_1',
+    tags: ['existential', 'clean-living'],
+    text: "You stare into the void so politely that the void files a support ticket, escalates it to management, and accidentally closes your account.",
+    tagline: "The void appreciated your patience."
+  },
+  {
+    id: 'mood_reckless_1',
+    tags: ['reckless-mood', 'reckless', 'chaotic'],
+    text: "A sudden urge to make the day more interesting leads you to press a large red button labeled 'probably decorative.' It is not decorative.",
+    tagline: "Impulse control left you on read."
+  },
+  {
+    id: 'mood_calm_1',
+    tags: ['calm', 'clean-living'],
+    text: "Your calm becomes so powerful that fate mistakes you for a threat and sends a highly localized administrative meteor.",
+    tagline: "Serenity had consequences."
+  },
+  {
+    id: 'clean_living_1',
+    tags: ['clean-living'],
+    text: "Your excellent habits confuse fate, which panics and schedules something wildly unfair involving a loose bookshelf and one missing Allen key.",
+    tagline: "Virtue delayed the inevitable, briefly."
+  },
+  {
+    id: 'clean_living_2',
+    tags: ['clean-living'],
+    text: "You live responsibly for years, then lose a duel with a poorly assembled flat-pack wardrobe named after a Swedish vowel.",
+    tagline: "Clean living, messy ending."
+  },
+  {
+    id: 'tech_doom_1',
+    tags: ['tech-doom'],
+    text: "You open one final Jira ticket and vanish into the backlog forever, where estimates are eternal and acceptance criteria are written in riddles.",
+    tagline: "Moved to Done, spiritually."
+  },
+  {
+    id: 'tech_doom_2',
+    tags: ['tech-doom'],
+    text: "You accept all cookies and are immediately crushed by a pallet of actual cookies delivered under an alarmingly literal privacy policy.",
+    tagline: "Consent has consequences."
+  },
+  {
     id: 'general_1',
-    tags: [], // Fallback general
+    tags: ['tech-doom'], // Fallback general
     text: "While distracted trying to calculate your exact remaining life expectancy on a questionable website, you walk directly into a low-hanging tree branch.",
     tagline: "Irony is a harsh mistress."
   },
@@ -197,11 +305,21 @@ function getBaseExpectancy(country: string, gender: QuizAnswers['gender']): numb
 function determineTags(answers: QuizAnswers): string[] {
   const tags: string[] = [];
   
-  if (answers.hasSpeedingTicket) tags.push('reckless');
+  if (answers.drinksAlcohol) tags.push('party-risk');
+  if (answers.hasSpeedingTicket) tags.push('reckless', 'road-risk');
   if (answers.exerciseLevel === 'low') tags.push('sedentary');
+  if (answers.exerciseLevel === 'high') tags.push('fitness-irony');
   if (answers.exerciseLevel === 'high' && !answers.drinksAlcohol) tags.push('health-nut');
-  if (answers.drinksAlcohol && answers.hasSpeedingTicket) tags.push('chaotic');
-  if (answers.hasCarCrash) tags.push('unlucky');
+  if (answers.drinksAlcohol && answers.hasSpeedingTicket) tags.push('chaotic', 'reckless-party');
+  if (answers.exerciseLevel === 'low' && answers.drinksAlcohol) tags.push('couch-party');
+  if (answers.mood === 'calm') tags.push('calm', 'clean-living');
+  if (answers.mood === 'stressed') tags.push('stressed', 'tech-doom', 'chaotic');
+  if (answers.mood === 'reckless') tags.push('reckless-mood', 'reckless', 'chaotic');
+  if (answers.mood === 'existential') tags.push('existential', 'clean-living');
+  if ((answers.country || '').trim().toLowerCase() === 'australia') tags.push('australia');
+  if (!answers.drinksAlcohol && !answers.hasSpeedingTicket && answers.exerciseLevel !== 'low' && answers.mood === 'calm') {
+    tags.push('clean-living', 'tech-doom');
+  }
 
   return tags;
 }
@@ -216,7 +334,6 @@ function calculateDeathDate(answers: QuizAnswers): { dateStr: string; daysLeft: 
   // Apply modifiers (as defined by PRD)
   if (answers.drinksAlcohol) baseExpectancy -= 2.0;
   if (answers.hasSpeedingTicket) baseExpectancy -= 1.5;
-  if (answers.hasCarCrash) baseExpectancy -= 1.5;
   if (answers.exerciseLevel === 'low') baseExpectancy -= 3.0;
   if (answers.exerciseLevel === 'high') baseExpectancy += 2.0;
 
@@ -252,10 +369,16 @@ export function getReading(answers: QuizAnswers): Reading {
   // 1. Tag matching logic
   const targetTags = determineTags(answers);
   
-  // Filter bank down to elements containing AT LEAST one matching user tag
-  let matchingPool = SCENARIO_BANK.filter(scenario => 
-    scenario.tags.some(tag => targetTags.includes(tag))
-  );
+  // Score scenarios by specificity so combined answers beat broad one-tag matches.
+  const scoredScenarios = SCENARIO_BANK.map(scenario => ({
+    scenario,
+    score: scenario.tags.filter(tag => targetTags.includes(tag)).length
+  }));
+
+  const highestScore = Math.max(...scoredScenarios.map(({ score }) => score));
+  let matchingPool = scoredScenarios
+    .filter(({ score }) => score === highestScore && score > 0)
+    .map(({ scenario }) => scenario);
 
   // Fallback pool handling if no tags match or if array runs dry
   if (matchingPool.length === 0) {
