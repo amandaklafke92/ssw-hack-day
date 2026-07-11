@@ -68,3 +68,56 @@ export function OrbIcon({ size = 40, className }: IconProps) {
     </svg>
   );
 }
+
+export function ReaperSilhouette({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 200 340"
+      className={className}
+      aria-hidden="true"
+      preserveAspectRatio="xMidYMax meet"
+    >
+      <defs>
+        <linearGradient id="reaper-cloak" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#241a30" />
+          <stop offset="100%" stopColor="#0a0710" />
+        </linearGradient>
+        <radialGradient id="reaper-eye-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#c084fc" stopOpacity="1" />
+          <stop offset="100%" stopColor="#c084fc" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* scythe */}
+      <g className="reaper-scythe" stroke="#1a1420" strokeWidth="4" strokeLinecap="round" fill="none">
+        <path d="M158 40 L120 260" />
+        <path d="M158 40 C 120 8, 60 14, 44 56" strokeWidth="7" />
+      </g>
+
+      {/* cloak */}
+      <path
+        d="M100 30
+           C 70 30, 60 60, 58 90
+           C 40 130, 20 220, 14 300
+           C 45 285, 55 300, 75 292
+           C 88 300, 96 288, 100 296
+           C 104 288, 112 300, 125 292
+           C 145 300, 155 285, 186 300
+           C 180 220, 160 130, 142 90
+           C 140 60, 130 30, 100 30 Z"
+        fill="url(#reaper-cloak)"
+      />
+
+      {/* hood shadow / face void */}
+      <ellipse cx="100" cy="78" rx="26" ry="30" fill="#050308" />
+
+      {/* eyes */}
+      <g className="reaper-eyes">
+        <circle cx="90" cy="76" r="9" fill="url(#reaper-eye-glow)" />
+        <circle cx="110" cy="76" r="9" fill="url(#reaper-eye-glow)" />
+        <circle cx="90" cy="76" r="2.2" fill="#e9d8ff" />
+        <circle cx="110" cy="76" r="2.2" fill="#e9d8ff" />
+      </g>
+    </svg>
+  );
+}
