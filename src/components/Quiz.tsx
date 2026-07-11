@@ -63,22 +63,22 @@ function YesNoField({
   );
 }
 
+const DEFAULT_AGE = 30;
+
 export function Quiz({ onSubmit }: QuizProps) {
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
-  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
-
-  const ageValue = Number(form.age);
-  const isAgeValid = form.age.trim() !== '' && Number.isFinite(ageValue) && ageValue > 0 && ageValue < 130;
-  const isCountryValid = form.country.trim() !== '';
-  const canSubmit = isAgeValid && isCountryValid;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setAttemptedSubmit(true);
-    if (!canSubmit) return;
+
+    const ageValue = Number(form.age);
+    const age =
+      form.age.trim() !== '' && Number.isFinite(ageValue) && ageValue > 0 && ageValue < 130
+        ? Math.round(ageValue)
+        : DEFAULT_AGE;
 
     const answers: QuizAnswers = {
-      age: Math.round(ageValue),
+      age,
       gender: form.gender || 'other',
       country: form.country.trim(),
       drinksAlcohol: form.drinksAlcohol === 'yes',
@@ -111,9 +111,6 @@ export function Quiz({ onSubmit }: QuizProps) {
             value={form.age}
             onChange={(e) => setForm((f) => ({ ...f, age: e.target.value }))}
           />
-          {attemptedSubmit && !isAgeValid && (
-            <div className="field-error">Enter a valid age to continue.</div>
-          )}
         </div>
 
         <div className="field">
@@ -155,9 +152,6 @@ export function Quiz({ onSubmit }: QuizProps) {
               <option value={country} key={country} />
             ))}
           </datalist>
-          {attemptedSubmit && !isCountryValid && (
-            <div className="field-error">Enter your country to continue.</div>
-          )}
         </div>
 
         <YesNoField
