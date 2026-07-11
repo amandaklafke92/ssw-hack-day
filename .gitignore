@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Reference/inspiration material not shipped in the app
+/assets/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
